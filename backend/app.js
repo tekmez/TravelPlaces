@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParse = require("body-parser");
 const placesRoute = require("./routes/places-routes");
 const userRoute = require("./routes/users-routes");
-
+const port = 5000;
 const app = express();
 
 app.use("/api/places", placesRoute);
@@ -16,4 +16,4 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occured" });
 });
 
-app.listen(5000);
+app.listen(port);
