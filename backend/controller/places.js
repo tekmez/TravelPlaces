@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
-const DUMMY_PLACES = [
+const { v4: uuidv4 } = require("uuid");
+let DUMMY_PLACES = [
   {
     id: "p1",
     title: "Empire State Building",
@@ -23,16 +24,51 @@ const getPlaceById = (req, res, next) => {
   res.json({ place });
 };
 
-const getPlaceByUserId = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.id;
-  const place = DUMMY_PLACES.find((user) => user.creator === userId);
-  if (!place) {
+  const places = DUMMY_PLACES.filter((user) => {
+    return user.creator === userId;
+  });
+  if (!places || places.length === 0) {
     return next(
-      new HttpError("Could not find a user for the provided id.", 404)
+      new HttpError("Could not find places for the provided id.", 404)
     );
   }
-  res.json({ place });
+  res.status(200).json({ places });
 };
 
+const createPlace = (req, res) => {
+  const { title, description, coordinates, address, creator } = req.body;
+  const createdPlace = {
+    id: uuidv4(),
+    title,
+    description,
+    location: coordinates,
+    address,
+    creator,
+  };
+  DUMMY_PLACES.push(createdPlace);
+  res.status(201).json({ place: createdPlace });
+};
+
+const updatePlaceById = (req, res, next) => {
+  const { title, description } = req.body;
+  const placeId = req.params.id;
+  const place = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
+  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+  place.title = title;
+  place.description = description;
+  DUMMY_PLACES[placeIndex] = place;
+  res.status(200).json({ place });
+};
+
+const deletePlace = (req, res, next) => {
+  const placeId = req.params.id;
+  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
+  res.status(200).json({ message: "deleted place" });
+};
 exports.getPlaceById = getPlaceById;
-exports.getPlaceByUserId = getPlaceByUserId;
+exports.getPlacesByUserId = getPlacesByUserId;
+exports.createPlace = createPlace;
+exports.updatePlaceById = updatePlaceById;
+exports.deletePlace = deletePlace;
