@@ -8,7 +8,7 @@ const port = 5000;
 const app = express();
 app.use(bodyParser.json());
 app.use("/api/places", placesRoute);
-app.use("/api/user", userRoute);
+app.use("/api/users", userRoute);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route", 404);
