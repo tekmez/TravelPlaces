@@ -1,4 +1,5 @@
 const express = require("express");
+const HttpError = require("../models/http-error");
 const router = express.Router();
 const DUMMY_PLACES = [
   {
@@ -22,6 +23,9 @@ const DUMMY_PLACES = [
 router.get("/:id", (req, res, next) => {
   const userId = req.params.id;
   const user = DUMMY_PLACES.find((user) => user.id === userId);
+  if (!user) {
+    return next(new HttpError("Could not find a user", 404));
+  }
   res.json({ user });
 });
 
